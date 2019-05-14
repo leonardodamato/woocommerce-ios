@@ -312,6 +312,7 @@ private extension StorePickerViewController {
     ///
     func reloadInterface() {
         actionButton.setTitle(state.actionTitle, for: .normal)
+        actionButton.accessibilityIdentifier = "pick-store-button"
         tableView.separatorStyle = state.separatorStyle
         tableView.reloadData()
     }

@@ -170,6 +170,11 @@ public class AppRatingManager {
     /// been shut off entirely.
     ///
     func shouldPromptForAppReview(section name: String) -> Bool {
+
+        guard UserDefaults.standard.bool(forKey: "FASTLANE_SNAPSHOT") == false else {
+            return false
+        }
+
         guard let section = sections[name] else {
             assertionFailure("Invalid section \(name)")
             return false

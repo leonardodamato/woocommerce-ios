@@ -1,0 +1,64 @@
+{
+	"version": 0.1,
+	"shadow_offset": 0,
+	"background_color": "#FFFFFF",
+	"stylesheet": "appstoreres/assets/styles/style.css",
+	"devices": [
+		{
+			"name": "iPhone Xs",
+			"canvas_size": [1242,2208],
+			"text_size": [1242, 313],
+			"text_offset": [0, 192],
+			"font_size": "68px"
+		}
+	],
+	"entries": [
+		{
+			"device": "iPhone Xs",
+			"filename": "01-test.png",
+			"background": "appstoreres/assets/iphone-xs/01-background.png",
+			"attachments": [
+				{
+					"file": "appstoreres/assets/wc-logo.svg",
+					"size": [526,107],
+					"position": [279,126]
+				},
+				{
+					"text": "metadata/{locale}/app_store_screenshot_1.txt",
+					"font-size": 144,
+					"size": [1242, 600],
+					"position": [0, 620],
+					"stylesheet": "appstoreres/assets/styles/first-screen-heading.css"
+				},
+				{
+					"text": "metadata/{locale}/app_store_screenshot_1b.txt",
+					"font-size": 40,
+					"size": [1242, 250],
+					"position": [0, 1896],
+					"stylesheet": "appstoreres/assets/styles/first-screen-footer.css"
+				}
+			]
+		},
+		// View and manage orders
+		{
+			"device": "iPhone Xs",
+			"text": "metadata/{locale}/app_store_screenshot_2.txt",
+			"filename": "02-test.png",
+			"background":  "appstoreres/assets/iphone-xs/02-background.png",
+			"attachments": [
+				{
+					"file": "screenshots/{locale}/iPhone 8-01-orders-list.png",
+					"size": [675,1050],
+					"position": [120, 541],
+					"operations": [
+						{
+							"type": "crop",
+							"at": [0, 34],
+							"to": [750, 1166]
+						}
+					]
+				}
+			]
+		}
+	]
+}

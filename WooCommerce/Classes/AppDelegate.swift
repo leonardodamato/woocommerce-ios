@@ -86,6 +86,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Upgrade check...
         checkForUpgrades()
 
+        if CommandLine.arguments.contains("--UITests") {
+            UIView.setAnimationsEnabled(false)
+        }
+
         return true
     }
 

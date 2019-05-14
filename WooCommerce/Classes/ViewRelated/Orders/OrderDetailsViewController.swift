@@ -145,6 +145,7 @@ private extension OrderDetailsViewController {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.refreshControl = refreshControl
         tableView.separatorInset = .zero
+        tableView.accessibilityIdentifier = "order-details-table"
     }
 
     /// Setup: Navigation
@@ -499,6 +500,7 @@ private extension OrderDetailsViewController {
         cell.labelText = viewModel.addNoteText
 
         cell.accessibilityTraits = .button
+        cell.accessibilityIdentifier = "add-a-note-row"
         cell.accessibilityLabel = NSLocalizedString(
             "Add a note button",
             comment: "Accessibility label for the 'Add a note' button"

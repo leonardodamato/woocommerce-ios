@@ -112,6 +112,7 @@ private extension LoginPrologueViewController {
         loginButton.titleLabel?.font = StyleManager.headlineSemiBold
         loginButton.backgroundColor = .white
         loginButton.layer.cornerRadius = Settings.buttonCornerRadius
+        loginButton.accessibilityIdentifier = "login-with-jetpack-button"
     }
 }
 

@@ -99,6 +99,8 @@ private extension OrderNoteTableViewCell {
         noteLabel.applyBodyStyle()
         statusLabel.applyBodyStyle()
         statusLabel.textColor = StyleManager.wooGreyMid
+
+        self.accessibilityIdentifier = "order-note-table-view-cell"
     }
 
     /// Setup: Icon Button
