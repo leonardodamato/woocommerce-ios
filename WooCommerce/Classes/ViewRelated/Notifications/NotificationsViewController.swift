@@ -204,6 +204,7 @@ private extension NotificationsViewController {
     func configureNavigationBarButtons() {
         leftBarButton.tintColor = .white
         leftBarButton.accessibilityTraits = .button
+        leftBarButton.accessibilityIdentifier = "mark-all-notifications-as-read-button"
         leftBarButton.accessibilityLabel = NSLocalizedString("Mark All as Read", comment: "Accessibility label for the Mark All Notifications as Read Button")
         leftBarButton.accessibilityHint = NSLocalizedString("Marks Every Notification as Read",
                                                             comment: "VoiceOver accessibility hint for the Mark All Notifications as Read Action")
@@ -211,6 +212,7 @@ private extension NotificationsViewController {
 
         rightBarButton.tintColor = .white
         rightBarButton.accessibilityTraits = .button
+        rightBarButton.accessibilityIdentifier = "filter-notifications-button"
         rightBarButton.accessibilityLabel = NSLocalizedString("Filter notifications", comment: "Accessibility label for the Filter notifications button.")
         rightBarButton.accessibilityHint = NSLocalizedString("Filters the notifications list by notification type.",
                                                              comment: "VoiceOver accessibility hint, informing the user the button can be used to filter the notifications list."

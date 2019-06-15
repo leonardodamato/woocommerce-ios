@@ -50,6 +50,10 @@ class TopPerformersViewController: ButtonBarPagerTabStripViewController {
         /// Hide the ImageView:
         /// We don't use it, and if / when "Ghostified" produces a quite awful placeholder UI!
         cell.imageView.isHidden = true
+
+        if let userInfo = indicatorInfo.userInfo as? TopPerformerTabData {
+            cell.accessibilityIdentifier = userInfo.granularity.rawValue
+        }
     }
 }
 
@@ -168,6 +172,9 @@ private extension TopPerformersViewController {
             oldCell?.label.textColor = StyleManager.defaultTextColor
             newCell?.label.textColor = StyleManager.wooCommerceBrandColor
         }
+
+//        self.buttonBarView.isAccessibilityElement = true
+        self.buttonBarView.accessibilityIdentifier = "top-performers-tab-picker-bar"
     }
 }
 

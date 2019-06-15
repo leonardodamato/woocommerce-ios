@@ -38,11 +38,26 @@ struct UITestHelpers {
         var iteration = 0
 
         while !elementIsFullyVisibleOnScreen(element: element) && iteration < threshold {
-            scrollView.scroll(byDeltaX: 0, deltaY: 100)
+            scrollDown(in: scrollView, by: 100)
             iteration += 1
         }
 
+
         if !elementIsFullyVisibleOnScreen(element: element, offsetSize: CGSize(width: 0, height: xoffset)) {
+            XCTFail("Unable to scroll element into view")
+        }
+    }
+
+    public static func scrollElementIntoViewHorizontally(element: XCUIElement, within scrollView: XCUIElement, threshold: Int = 1000) {
+
+        var iteration = 0
+
+        while !elementIsFullyVisibleOnScreen(element: element) && iteration < threshold {
+            scrollRight(in: scrollView, by: 100)
+            iteration += 1
+        }
+        
+        if !elementIsFullyVisibleOnScreen(element: element, offsetSize: .zero) {
             XCTFail("Unable to scroll element into view")
         }
     }
@@ -53,8 +68,12 @@ struct UITestHelpers {
             .coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 1))
     }
 
-    public static func scrollElementToBottomOfScreen() {
+    static internal func scrollDown(in view: XCUIElement, by amount: CGFloat) {
+        view.scroll(byDeltaX: 0, deltaY: amount)
+    }
 
+    static internal func scrollRight(in view: XCUIElement, by amount: CGFloat) {
+        view.scroll(byDeltaX: amount * -1, deltaY: 0)
     }
 }
 
@@ -72,8 +91,7 @@ extension XCTestCase {
 extension XCUIElement {
 
     func scroll(byDeltaX deltaX: CGFloat, deltaY: CGFloat) {
-
-        let startCoordinate = self.coordinate(withNormalizedOffset: CGVector(dx: 0, dy: 0))
+        let startCoordinate = self.coordinate(withNormalizedOffset: CGVector(dx: self.frame.maxX, dy: 0))
         let destination = startCoordinate.withOffset(CGVector(dx: deltaX, dy: deltaY * -1))
 
         startCoordinate.press(forDuration: 0.01, thenDragTo: destination)

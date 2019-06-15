@@ -146,6 +146,7 @@ private extension TopPerformerDataViewController {
         tableView.estimatedSectionHeaderHeight = Constants.estimatedSectionHeight
         tableView.rowHeight = UITableView.automaticDimension
         tableView.tableFooterView = Constants.emptyView
+        tableView.accessibilityIdentifier = "top-performer-table-\(self.granularity.rawValue)"
     }
 
     func configureResultsController() {
@@ -180,10 +181,15 @@ private extension TopPerformerDataViewController {
 //
 extension TopPerformerDataViewController {
     func indicatorInfo(for pagerTabStripController: PagerTabStripViewController) -> IndicatorInfo {
-        return IndicatorInfo(title: tabDescription)
+        var indicatorInfo = IndicatorInfo(title: tabDescription)
+        indicatorInfo.userInfo = TopPerformerTabData(granularity: self.granularity)
+        return indicatorInfo
     }
 }
 
+struct TopPerformerTabData {
+    let granularity: StatGranularity
+}
 
 // MARK: - UITableViewDataSource Conformance
 //

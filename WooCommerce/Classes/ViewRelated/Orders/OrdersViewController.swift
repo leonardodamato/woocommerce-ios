@@ -217,6 +217,7 @@ private extension OrdersViewController {
                                          action: #selector(displaySearchOrders))
             button.tintColor = .white
             button.accessibilityTraits = .button
+            button.accessibilityIdentifier = "start-searching-button"
             button.accessibilityLabel = NSLocalizedString("Search orders", comment: "Search Orders")
             button.accessibilityHint = NSLocalizedString(
                 "Retrieves a list of orders that contain a given keyword.",
@@ -233,6 +234,7 @@ private extension OrdersViewController {
                                                  action: #selector(displayFiltersAlert))
             button.tintColor = .white
             button.accessibilityTraits = .button
+            button.accessibilityIdentifier = "start-filtering-orders"
             button.accessibilityLabel = NSLocalizedString("Filter orders", comment: "Filter the orders list.")
             button.accessibilityHint = NSLocalizedString(
                 "Filters the order list by payment status.",

@@ -345,6 +345,9 @@
 		D8A8C4F32268288F001C72BF /* AddManualCustomTrackingViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8A8C4F22268288F001C72BF /* AddManualCustomTrackingViewModelTests.swift */; };
 		D8AB131E225DC25F002BB5D1 /* MockOrders.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8AB131D225DC25F002BB5D1 /* MockOrders.swift */; };
 		D8C62471227AE0030011A7D6 /* SiteCountry.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8C62470227AE0030011A7D6 /* SiteCountry.swift */; };
+		F93892CD22B4AC100029F5BE /* DashboardScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93892CC22B4AC100029F5BE /* DashboardScreen.swift */; };
+		F93892CF22B4AC160029F5BE /* NotificationsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93892CE22B4AC160029F5BE /* NotificationsScreen.swift */; };
+		F93892D122B4C5180029F5BE /* OrdersScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93892D022B4C5180029F5BE /* OrdersScreen.swift */; };
 		F9A39B4722B2DDA800949472 /* WooCommerceScreenshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9A39B4622B2DDA800949472 /* WooCommerceScreenshots.swift */; };
 		F9A39B4F22B2DDDB00949472 /* XCTestCase+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9A39B4E22B2DDDB00949472 /* XCTestCase+Extensions.swift */; };
 		F9A39B5122B2DE0400949472 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9A39B5022B2DE0400949472 /* SnapshotHelper.swift */; };
@@ -746,6 +749,9 @@
 		D8A8C4F22268288F001C72BF /* AddManualCustomTrackingViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AddManualCustomTrackingViewModelTests.swift; path = WooCommerceTests/Model/AddManualCustomTrackingViewModelTests.swift; sourceTree = SOURCE_ROOT; };
 		D8AB131D225DC25F002BB5D1 /* MockOrders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockOrders.swift; sourceTree = "<group>"; };
 		D8C62470227AE0030011A7D6 /* SiteCountry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteCountry.swift; sourceTree = "<group>"; };
+		F93892CC22B4AC100029F5BE /* DashboardScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DashboardScreen.swift; path = Screens/DashboardScreen.swift; sourceTree = "<group>"; };
+		F93892CE22B4AC160029F5BE /* NotificationsScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NotificationsScreen.swift; path = Screens/NotificationsScreen.swift; sourceTree = "<group>"; };
+		F93892D022B4C5180029F5BE /* OrdersScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrdersScreen.swift; sourceTree = "<group>"; };
 		F9A39B4422B2DDA800949472 /* WooCommerceScreenshots.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WooCommerceScreenshots.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9A39B4622B2DDA800949472 /* WooCommerceScreenshots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WooCommerceScreenshots.swift; sourceTree = "<group>"; };
 		F9A39B4822B2DDA800949472 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1609,6 +1615,9 @@
 				F9A39B4622B2DDA800949472 /* WooCommerceScreenshots.swift */,
 				F9A39B4E22B2DDDB00949472 /* XCTestCase+Extensions.swift */,
 				F9A39B5022B2DE0400949472 /* SnapshotHelper.swift */,
+				F93892CC22B4AC100029F5BE /* DashboardScreen.swift */,
+				F93892CE22B4AC160029F5BE /* NotificationsScreen.swift */,
+				F93892D022B4C5180029F5BE /* OrdersScreen.swift */,
 				F9A39B4822B2DDA800949472 /* Info.plist */,
 			);
 			path = WooCommerceScreenshots;
@@ -2281,8 +2290,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F93892CF22B4AC160029F5BE /* NotificationsScreen.swift in Sources */,
+				F93892CD22B4AC100029F5BE /* DashboardScreen.swift in Sources */,
 				F9A39B4F22B2DDDB00949472 /* XCTestCase+Extensions.swift in Sources */,
 				F9A39B4722B2DDA800949472 /* WooCommerceScreenshots.swift in Sources */,
+				F93892D122B4C5180029F5BE /* OrdersScreen.swift in Sources */,
 				F9A39B5122B2DE0400949472 /* SnapshotHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

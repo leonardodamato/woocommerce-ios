@@ -20,15 +20,10 @@ class WooCommerceScreenshots: XCTestCase {
 
     private let username = "nuttystephen.bem8kzmg@mailosaur.io"
     private let password = "0c62e592-4ae2-415e-8e86-0404eabc82da"
-
-     private func switchToOrders() {
+    
+    private func switchToOrders() {
         waitForElementToExist(element: app.tabBars.firstMatch)
         app.tabBars.firstMatch.children(matching: .button).allElementsBoundByIndex[1].tap()
-    }
-
-    private func switchToNotifications() {
-        waitForElementToExist(element: app.tabBars.firstMatch)
-        app.tabBars.firstMatch.children(matching: .button).allElementsBoundByIndex[2].tap()
     }
 
     func testScreenshots() {
@@ -36,6 +31,44 @@ class WooCommerceScreenshots: XCTestCase {
         LogoutFlow().run()
         LoginFlow().run(username: username, password: password)
 
+        let ordersScreen = OrdersScreen().start()
+            .startSearching()
+
+        snapshot("order-searching")
+        ordersScreen.stopSearching()
+
+        ordersScreen.startFiltering()
+        snapshot("order-filtering")
+        ordersScreen.stopFiltering()
+
+        screenshotLastOrder()
+        screenshotOrder(atIndex: 1)
+        screenshotOrder(atIndex: 2)
+        screenshotOrder(atIndex: 3)
+        screenshotOrder(atIndex: 0)
+
+        DashboardScreen().start()
+            .switchTopPerformersToYearView()
+            .scrollTopPerformersTableToBottom()
+
+        snapshot("07-stats")
+
+        let notificationsScreen = NotificationsScreen().start()
+        snapshot("03-notifications")
+
+        notificationsScreen.switchToOnlyShowingOrders()
+        snapshot("notifications-orders")
+
+        notificationsScreen.switchToOnlyShowingReviews()
+        snapshot("notifications-reviews")
+
+        if let productReviewCell = app.tables.firstMatch.cells.lastMatch {
+            productReviewCell.tap()
+            snapshot("03-product-review")
+        }
+    }
+
+    private func screenshotLastOrder() {
         self.switchToOrders()
         snapshot("01-orders-list")
         app.cells.lastMatch?.tap()
@@ -48,19 +81,21 @@ class WooCommerceScreenshots: XCTestCase {
 
         UITestHelpers.scrollElementIntoView(element: lastCell, within: table)
         snapshot("02b-order-details")
-
-        switchToNotifications()
-        snapshot("03-notifications")
-        
-        if let productReviewCell = app.tables.firstMatch.cells.lastMatch {
-            productReviewCell.tap()
-            snapshot("03-product-review")
-        }
     }
-}
 
-class NotificationsActions {
+    private func screenshotOrder(atIndex index: Int) {
+        self.switchToOrders()
+        app.cells.allElementsBoundByIndex[index].tap()
+        snapshot("single-order-\(index)")
 
+        let table = app.tables["order-details-table"]
+        let lastCell = table.cells
+            .allElementsBoundByIndex
+            .last!
+
+        UITestHelpers.scrollElementIntoView(element: lastCell, within: table)
+        snapshot("order-details-\(index)")
+    }
 }
 
 class TestingFlow {
@@ -146,6 +181,11 @@ class LogoutFlow: TestingFlow {
         tapSettingsButton()
         tapLogoutCell()
         confirmLogout()
+
+        if isCurrentlyLoggedIn {
+            tapLogoutCell()
+            confirmLogout(tryOtherButton: true)
+        }
     }
 
     private func switchToDashboardTab() {
@@ -163,10 +203,18 @@ class LogoutFlow: TestingFlow {
     }
 
     private func tapLogoutCell() {
-        app.tables.cells["logout-button"].tap()
+        let logoutButton = app.tables.cells["logout-button"]
+        UITestHelpers.scrollElementIntoView(element: logoutButton, within: app.tables.firstMatch)
+        logoutButton.tap()
     }
 
-    private func confirmLogout() {
-        app.alerts.buttons.allElementsBoundByIndex.last?.tap()
+    private func confirmLogout(tryOtherButton: Bool = false) {
+
+        if tryOtherButton {
+            app.alerts.buttons.lastMatch?.tap()
+        }
+        else {
+            app.alerts.buttons.firstMatch.tap()
+        }
     }
 }
