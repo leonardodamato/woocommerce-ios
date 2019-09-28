@@ -6,35 +6,37 @@
 	"devices": [
 		{
 			"name": "iPhone Xs",
+			"canvas_size": [1125,2436],
+			"text_size": [925, 313],
+			"text_offset": [100, 192],
+			"font_size": "86px"
+		},
+		{
+			"name": "iPhone 8",
 			"canvas_size": [1242,2208],
-			"text_size": [1242, 313],
-			"text_offset": [0, 192],
-			"font_size": "68px"
+			"text_size": [1042, 313],
+			"text_offset": [100, 192],
+			"font_size": "86px"
 		}
 	],
 	"entries": [
 		{
 			"device": "iPhone Xs",
-			"filename": "01-test.png",
-			"background": "appstoreres/assets/iphone-xs/01-background.png",
+			"filename": "01-iphone-x.png",
+			"background": "appstoreres/assets/simple/screenshot-1-iphone-x.png",
 			"attachments": [
-				{
-					"file": "appstoreres/assets/wc-logo.svg",
-					"size": [684,139],
-					"position": [279,191]
-				},
 				{
 					"text": "metadata/{locale}/app_store_screenshot_1.txt",
 					"font-size": 144,
-					"size": [1242, 600],
-					"position": [0, 620],
+					"size": [925, 600],
+					"position": [100, 889],
 					"stylesheet": "appstoreres/assets/styles/first-screen-heading.css"
 				},
 				{
 					"text": "metadata/{locale}/app_store_screenshot_1b.txt",
 					"font-size": 40,
-					"size": [1242, 250],
-					"position": [0, 1896],
+					"size": [925, 250],
+					"position": [100, 2135],
 					"stylesheet": "appstoreres/assets/styles/first-screen-footer.css"
 				}
 			]
@@ -43,217 +45,122 @@
 		{
 			"device": "iPhone Xs",
 			"text": "metadata/{locale}/app_store_screenshot_2.txt",
-			"filename": "02-test.png",
-			"background":  "appstoreres/assets/iphone-xs/02-background.png",
-			"attachments": [
-				// Left Side Screenshot
-				{
-					"file": "appstoreres/assets/iphone-xs/shadows/01-orders-left-shadow.png",
-					"size": [819,1210],
-					"position": [42, 475]
-				},
-				{
-					"file": "screenshots/{locale}/iPhone 8-01-orders-list.png",
-					"size": [675,1050],
-					"position": [120, 541],
-					"operations": [
-						{
-							"type": "crop",
-							"at": [0, 34],
-							"to": [750, 1166]
-						}
-					]
-				},
-				// Top Right Screenshot
-				{
-					"file": "appstoreres/assets/iphone-xs/shadows/01-orders-top-right.png",
-					"size": [835,880],
-					"position": [353, 626]
-				},
-				{
-					"file": "screenshots/{locale}/iPhone 8-single-order-3.png",
-					"size": [675,720],
-					"position": [447, 692],
-					"operations": [
-						{
-							"type": "crop",
-							"at": [0, 165],
-							"to": [750, 800]
-						}
-					]
-				},
-				// Bottom Right Screenshot
-				{
-					"file": "appstoreres/assets/iphone-xs/shadows/01-orders-bottom-right.png",
-					"size": [835,459],
-					"position": [353, 1420]
-				},
-				{
-					"file": "screenshots/{locale}/iPhone 8-order-details-3.png",
-					"size": [675,299],
-					"position": [447, 1486],
-					"operations": [
-						{
-							"type": "crop",
-							"at": [0, 868],
-							"to": [750, 332]
-						}
-					]
-				}
-			]
+			"filename": "02-iphone-x.png",
+			"background": "appstoreres/assets/simple/screenshot-2-iphone-x.png"
 		},
 		// Get real-time order alerts
 		{
 			"device": "iPhone Xs",
 			"text": "metadata/{locale}/app_store_screenshot_3.txt",
-			"filename": "03-test.png",
-			"background":  "appstoreres/assets/iphone-xs/03-background.png",
-			"attachments": [
-				// Left Side Screenshot
-				{
-					"file": "appstoreres/assets/iphone-xs/shadows/03-order-alerts-left.png",
-					"size": [819,1018],
-					"position": [42, 780]
-				},
-				{
-					"file": "screenshots/{locale}/iPhone 8-single-order-2.png",
-					"size": [675,194],
-					"position": [120, 844],
-					"operations": [
-						{
-							"type": "crop",
-							"at": [0, 165],
-							"to": [750, 215]
-						}
-					]
-				},
-				{
-					"file": "screenshots/{locale}/iPhone 8-order-details-2.png",
-					"size": [675,661],
-					"position": [120, 1038],
-					"operations": [
-						{
-							"type": "crop",
-							"at": [0, 160],
-							"to": [750, 735]
-						}
-					]
-				},
-				// Right Side Screenshot
-				{
-					"file": "appstoreres/assets/iphone-xs/shadows/03-order-alerts-right.png",
-					"size": [835,925],
-					"position": [352, 476]
-				},
-				{
-					"file": "screenshots/{locale}/iPhone 8-notifications-orders.png",
-					"size": [675,765],
-					"position": [446, 542],
-					"operations": [
-						{
-							"type": "crop",
-							"at": [0, 34],
-							"to": [750, 849]
-						}
-					]
-				}
-			]
+			"filename": "03-iphone-x.png",
+			"background": "appstoreres/assets/simple/screenshot-3-iphone-x.png"
 		},
 		// Track order status
 		{
 			"device": "iPhone Xs",
 			"text": "metadata/{locale}/app_store_screenshot_4.txt",
-			"filename": "04-test.png",
-			"background":  "appstoreres/assets/iphone-xs/04-background.png",
-			"attachments": [
-				// Left Side Screenshot
-				// {
-				// 	"file": "appstoreres/assets/iphone-xs/shadows/01-orders-left-shadow.png",
-				// 	"size": [819,1210],
-				// 	"position": [42, 475]
-				// },
-				{
-					"file": "screenshots/{locale}/iPhone 8-single-order-2.png",
-					"size": [675,194],
-					"position": [120, 844],
-					"operations": [
-						{
-							"type": "crop",
-							"at": [0, 165],
-							"to": [750, 215]
-						}
-					]
-				},
-				{
-					"file": "screenshots/{locale}/iPhone 8-order-details-2.png",
-					"size": [675,661],
-					"position": [120, 1038],
-					"operations": [
-						{
-							"type": "crop",
-							"at": [0, 160],
-							"to": [750, 735]
-						}
-					]
-				},
-				{
-					"file": "screenshots/{locale}/iPhone 8-order-details-1.png",
-					"size": [675,841.5],
-					"position": [446, 542],
-					"operations": [
-						{
-							"type": "crop",
-							"at": [0, 267],
-							"to": [750, 935]
-						}
-					]
-				}
-			]
+			"filename": "04-iphone-x.png",
+			"background": "appstoreres/assets/simple/screenshot-5-iphone-x.png"
+		},
+		// Scroll through, filter, or look up specific orders
+		{
+			"device": "iPhone Xs",
+			"text": "metadata/{locale}/app_store_screenshot_5.txt",
+			"filename": "05-iphone-x.png",
+			"background": "appstoreres/assets/simple/screenshot-5-iphone-x.png"
+		},
+		// View store data by week, month, and year
+		{
+			"device": "iPhone Xs",
+			"text": "metadata/{locale}/app_store_screenshot_6.txt",
+			"filename": "06-iphone-x.png",
+			"background": "appstoreres/assets/simple/screenshot-6-iphone-x.png"
+		},
+		// Check which products are performing best
+		{
+			"device": "iPhone Xs",
+			"text": "metadata/{locale}/app_store_screenshot_7.txt",
+			"filename": "07-iphone-x.png",
+			"background": "appstoreres/assets/simple/screenshot-7-iphone-x.png"
 		},
 		// Get notified about customer reviews
 		{
 			"device": "iPhone Xs",
 			"text": "metadata/{locale}/app_store_screenshot_8.txt",
-			"filename": "08-test.png",
-			"background":  "appstoreres/assets/iphone-xs/08-background.png",
+			"filename": "08-iphone-x.png",
+			"background": "appstoreres/assets/simple/screenshot-8-iphone-x.png"
+		},
+
+		// iPhone 8
+		{
+			"device": "iPhone 8",
+			"filename": "01-iphone-8.png",
+			"background": "appstoreres/assets/simple/screenshot-1-iphone-8.png",
 			"attachments": [
-				// Left Side Screenshot
 				{
-					"file": "appstoreres/assets/iphone-xs/shadows/08-reviews-left.png",
-					"size": [819,1042],
-					"position": [42, 796]
+					"text": "metadata/{locale}/app_store_screenshot_1.txt",
+					"font-size": 144,
+					"size": [1042, 600],
+					"position": [100, 757],
+					"stylesheet": "appstoreres/assets/styles/first-screen-heading.css"
 				},
 				{
-					"file": "screenshots/{locale}/iPhone 8-notifications-reviews.png",
-					"size": [675,881],
-					"position": [120, 862],
-					"operations": [
-						{
-							"type": "crop",
-							"at": [0, 44],
-							"to": [750, 978]
-						}
-					]
-				},
-				// Right Side Screenshot
-				{
-					"file": "appstoreres/assets/iphone-xs/shadows/08-reviews-right.png",
-					"size": [835, 907],
-					"position": [353, 475]
-				},
-				{
-					"file": "screenshots/{locale}/iPhone 8-03-product-review.png",
-					"size": [675,747],
-					"position": [447, 541],
-					"operations": [
-						{
-							"type": "crop",
-							"at": [0, 44],
-							"to": [750, 830]
-						}
-					]
+					"text": "metadata/{locale}/app_store_screenshot_1b.txt",
+					"font-size": 40,
+					"size": [1042, 250],
+					"position": [100, 1896],
+					"stylesheet": "appstoreres/assets/styles/first-screen-footer.css"
 				}
 			]
+		},
+		// View and manage orders
+		{
+			"device": "iPhone 8",
+			"text": "metadata/{locale}/app_store_screenshot_2.txt",
+			"filename": "02-iphone-8.png",
+			"background": "appstoreres/assets/simple/screenshot-2-iphone-8.png"
+		},
+		// Get real-time order alerts
+		{
+			"device": "iPhone 8",
+			"text": "metadata/{locale}/app_store_screenshot_3.txt",
+			"filename": "03-iphone-8.png",
+			"background": "appstoreres/assets/simple/screenshot-3-iphone-8.png"
+		},
+		// Track order status
+		{
+			"device": "iPhone 8",
+			"text": "metadata/{locale}/app_store_screenshot_4.txt",
+			"filename": "04-iphone-8.png",
+			"background": "appstoreres/assets/simple/screenshot-5-iphone-8.png"
+		},
+		// Scroll through, filter, or look up specific orders
+		{
+			"device": "iPhone 8",
+			"text": "metadata/{locale}/app_store_screenshot_5.txt",
+			"filename": "05-iphone-8.png",
+			"background": "appstoreres/assets/simple/screenshot-5-iphone-8.png"
+		},
+		// View store data by week, month, and year
+		{
+			"device": "iPhone 8",
+			"text": "metadata/{locale}/app_store_screenshot_6.txt",
+			"filename": "06-iphone-8.png",
+			"background": "appstoreres/assets/simple/screenshot-6-iphone-8.png"
+		},
+		// Check which products are performing best
+		{
+			"device": "iPhone 8",
+			"text": "metadata/{locale}/app_store_screenshot_7.txt",
+			"filename": "07-iphone-8.png",
+			"background": "appstoreres/assets/simple/screenshot-7-iphone-8.png"
+		},
+		// Get notified about customer reviews
+		{
+			"device": "iPhone 8",
+			"text": "metadata/{locale}/app_store_screenshot_8.txt",
+			"filename": "08-iphone-8.png",
+			"background": "appstoreres/assets/simple/screenshot-8-iphone-8.png"
 		}
 	]
 }
