@@ -24,7 +24,10 @@ jobs:
       - fix-circleci
       - ios/install-dependencies:
             bundle-install: true
-            pod-install: true
+            pod-install: false
+      - run:
+          name: install pods for debug
+          command: bundle exec pod repo remove master && bundle exec pod install
       - ios/xcodebuild:
           command: build-for-testing
           arguments: -workspace 'WooCommerce.xcworkspace' -scheme 'WooCommerce' -configuration 'Debug' -sdk iphonesimulator -derivedDataPath DerivedData
