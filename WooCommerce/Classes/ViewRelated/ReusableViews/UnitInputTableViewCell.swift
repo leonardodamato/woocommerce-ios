@@ -39,6 +39,7 @@ final class UnitInputTableViewCell: UITableViewCell {
         inputTextField.keyboardType = viewModel.keyboardType
         inputFormatter = viewModel.inputFormatter
         onInputChange = viewModel.onInputChange
+        applyPlaceholderToEmptyTextField(textField: inputTextField)
     }
 }
 
@@ -93,5 +94,18 @@ private extension UnitInputTableViewCell {
         let formattedText = inputFormatter?.format(input: textField.text)
         textField.text = inputFormatter?.format(input: formattedText)
         onInputChange?(formattedText)
+        applyPlaceholderToEmptyTextField(textField: textField)
+    }
+}
+
+private extension UnitInputTableViewCell {
+    func applyPlaceholderToEmptyTextField(textField: UITextField) {
+        if textField.text == "0" {
+            unitLabel.textColor = .textSubtle
+            textField.textColor = .textSubtle
+        } else {
+            unitLabel.textColor = .text
+            textField.textColor = .text
+        }
     }
 }
