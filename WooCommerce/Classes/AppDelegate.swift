@@ -56,6 +56,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         setupPushNotificationsManagerIfPossible()
         setupAppRatingManager()
         setupWormholy()
+        setupKeyboardStateProvider()
+        handleLaunchArguments()
 
         // Display the Authentication UI
         displayAuthenticatorIfNeeded()
@@ -290,6 +292,27 @@ private extension AppDelegate {
         /// We want to activate it programmatically, not using the shake.
         Wormholy.shakeEnabled = false
         #endif
+    }
+
+    /// Set up `KeyboardStateProvider`
+    ///
+    func setupKeyboardStateProvider() {
+        // Simply _accessing_ it is enough. We only want the object to be initialized right away
+        // so it can start observing keyboard changes.
+        _ = ServiceLocator.keyboardStateProvider
+    }
+
+    func handleLaunchArguments() {
+        if ProcessInfo.processInfo.arguments.contains("logout-at-launch") {
+          ServiceLocator.stores.deauthenticate()
+        }
+
+        if ProcessInfo.processInfo.arguments.contains("disable-animations") {
+            UIView.setAnimationsEnabled(false)
+
+            /// Trick found at: https://twitter.com/twannl/status/1232966604142653446
+            UIApplication.shared.keyWindow?.layer.speed = 100
+        }
     }
 }
 

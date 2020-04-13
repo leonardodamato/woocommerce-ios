@@ -34,7 +34,9 @@ final class ProductInventorySettingsViewController: UIViewController {
     private lazy var throttler: Throttler = Throttler(seconds: 0.5)
 
     private lazy var keyboardFrameObserver: KeyboardFrameObserver = {
-        let keyboardFrameObserver = KeyboardFrameObserver(onKeyboardFrameUpdate: handleKeyboardFrameUpdate(keyboardFrame:))
+        let keyboardFrameObserver = KeyboardFrameObserver { [weak self] keyboardFrame in
+            self?.handleKeyboardFrameUpdate(keyboardFrame: keyboardFrame)
+        }
         return keyboardFrameObserver
     }()
 
@@ -168,8 +170,23 @@ extension ProductInventorySettingsViewController {
             return true
         }
 
-        if sku != product.sku || manageStockEnabled != product.manageStock || soldIndividually != product.soldIndividually ||
-            stockQuantity != product.stockQuantity || backordersSetting != product.backordersSetting || stockStatus != product.productStockStatus {
+        // Checks general settings regardless of whether stock management is enabled.
+        let hasChangesInGeneralSettings = sku != product.sku || manageStockEnabled != product.manageStock || soldIndividually != product.soldIndividually
+
+        if hasChangesInGeneralSettings {
+            presentBackNavigationActionSheet()
+            return false
+        }
+
+        // Checks stock settings depending on whether stock management is enabled.
+        let hasChangesInStockSettings: Bool
+        if manageStockEnabled {
+            hasChangesInStockSettings = stockQuantity != product.stockQuantity || backordersSetting != product.backordersSetting
+        } else {
+            hasChangesInStockSettings = stockStatus != product.productStockStatus
+        }
+
+        if hasChangesInStockSettings {
             presentBackNavigationActionSheet()
             return false
         }
@@ -189,9 +206,7 @@ extension ProductInventorySettingsViewController {
     }
 
     private func presentBackNavigationActionSheet() {
-        UIAlertController.presentSaveChangesActionSheet(viewController: self, onSave: { [weak self] in
-            self?.completeUpdating()
-        }, onDiscard: { [weak self] in
+        UIAlertController.presentDiscardChangesActionSheet(viewController: self, onDiscard: { [weak self] in
             self?.navigationController?.popViewController(animated: true)
         })
     }

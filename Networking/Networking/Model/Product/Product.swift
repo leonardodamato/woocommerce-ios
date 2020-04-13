@@ -87,6 +87,10 @@ public struct Product: Codable {
         return ProductStatus(rawValue: statusKey)
     }
 
+    public var productCatalogVisibility: ProductCatalogVisibility {
+        return ProductCatalogVisibility(rawValue: catalogVisibilityKey)
+    }
+
     public var productStockStatus: ProductStockStatus {
         return ProductStockStatus(rawValue: stockStatusKey)
     }
@@ -237,7 +241,7 @@ public struct Product: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         let productID = try container.decode(Int64.self, forKey: .productID)
-        let name = try container.decode(String.self, forKey: .name)
+        let name = try container.decode(String.self, forKey: .name).strippedHTML
         let slug = try container.decode(String.self, forKey: .slug)
         let permalink = try container.decode(String.self, forKey: .permalink)
 
@@ -266,16 +270,16 @@ public struct Product: Codable {
 
         let regularPrice = try container.decodeIfPresent(String.self, forKey: .regularPrice)
 
+        let onSale = try container.decode(Bool.self, forKey: .onSale)
+
         // Even though a plain install of WooCommerce Core provides string values,
         // some plugins alter the field value from String to Int or Decimal.
         var salePrice = ""
         if let parsedSalePriceString = container.failsafeDecodeIfPresent(stringForKey: .salePrice) {
-            salePrice = parsedSalePriceString
+            salePrice = (onSale && parsedSalePriceString.isEmpty) ? "0" : parsedSalePriceString
         } else if let parsedSalePriceDecimal = container.failsafeDecodeIfPresent(decimalForKey: .salePrice) {
             salePrice = NSDecimalNumber(decimal: parsedSalePriceDecimal).stringValue
         }
-
-        let onSale = try container.decode(Bool.self, forKey: .onSale)
 
         let purchasable = try container.decode(Bool.self, forKey: .purchasable)
         let totalSales = container.failsafeDecodeIfPresent(Int.self, forKey: .totalSales) ?? 0
@@ -447,6 +451,15 @@ public struct Product: Codable {
         try container.encode(stockQuantity, forKey: .stockQuantity)
         try container.encode(backordersKey, forKey: .backordersKey)
         try container.encode(stockStatusKey, forKey: .stockStatusKey)
+
+        // Brief description (short description).
+        try container.encode(briefDescription, forKey: .briefDescription)
+
+        // Product Settings
+        try container.encode(statusKey, forKey: .statusKey)
+        try container.encode(featured, forKey: .featured)
+        try container.encode(catalogVisibilityKey, forKey: .catalogVisibilityKey)
+        try container.encode(slug, forKey: .slug)
     }
 }
 

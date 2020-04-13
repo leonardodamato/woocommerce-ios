@@ -5,18 +5,61 @@ import Yosemite
 
 class Product_ProductFormTests: XCTestCase {
 
+    private let sampleSiteID: Int64 = 109
+
     func testTrimmedFullDescriptionWithLeadingNewLinesAndHTMLTags() {
         let description = "\n\n\n  <p>This is the party room!</p>\n"
         let product = sampleProduct(description: description)
         let expectedDescription = "This is the party room!"
         XCTAssertEqual(product.trimmedFullDescription, expectedDescription)
     }
+
+    func testTrimmedBriefDescriptionWithLeadingNewLinesAndHTMLTags() {
+        let description = "\n\n\n  <p>This is the party room!</p>\n"
+        let product = sampleProduct(briefDescription: description)
+        let expectedDescription = "This is the party room!"
+        XCTAssertEqual(product.trimmedBriefDescription, expectedDescription)
+    }
+
+    func testNoCategoryDescriptionOutputsNilDescription() {
+        let product = sampleProduct(categories: [])
+        XCTAssertNil(product.categoriesDescription())
+    }
+
+    func testSingleCategoryDescriptionOutputsSingleCategory() {
+        let category = sampleCategory(name: "Pants")
+        let product = sampleProduct(categories: [category])
+        let expectedDescription = "Pants"
+        XCTAssertEqual(product.categoriesDescription(), expectedDescription)
+    }
+
+    func testMutipleCategoriesDescriptionOutputsFormattedList() {
+        let categories = ["Pants", "Dress", "Shoes"].map { sampleCategory(name: $0) }
+        let product = sampleProduct(categories: categories)
+        let expectedDescription: String = {
+            if #available(iOS 13.0, *) {
+                return "Pants, Dress, and Shoes"
+            } else {
+                return "Pants, Dress, Shoes"
+            }
+        }()
+        let usLocale = Locale(identifier: "en_US")
+        XCTAssertEqual(product.categoriesDescription(using: usLocale), expectedDescription)
+    }
 }
 
 private extension Product_ProductFormTests {
 
-    func sampleProduct(description: String?) -> Product {
-        return Product(siteID: 109,
+    func sampleCategory(name: String = "") -> ProductCategory {
+        return ProductCategory(categoryID: Int64.random(in: 0 ..< Int64.max),
+                               siteID: sampleSiteID,
+                               parentID: 0,
+                               name: name,
+                               slug: "")
+    }
+
+    func sampleProduct(description: String? = "", briefDescription: String? = "", categories: [ProductCategory] = []) -> Product {
+        return Product(siteID: sampleSiteID,
                        productID: 177,
                        name: "Book the Green Room",
                        slug: "book-the-green-room",
@@ -30,12 +73,7 @@ private extension Product_ProductFormTests {
                        featured: false,
                        catalogVisibilityKey: "visible",
                        fullDescription: description,
-                       briefDescription: """
-                       [contact-form]\n<p>The green room&#8217;s max capacity is 30 people. Reserving the date / time of your event is free. \
-                       We can also accommodate large groups, with seating for 85 board game players at a time. If you have a large group, let us \
-                       know and we&#8217;ll send you our large group rate.</p>\n<p>GROUP RATES</p>\n<p>Reserve your event for up to 30 guests \
-                       for $100.</p>\n
-                       """,
+                       briefDescription: briefDescription,
                        sku: "",
                        price: "0",
                        regularPrice: "",
@@ -73,7 +111,7 @@ private extension Product_ProductFormTests {
                        crossSellIDs: [1234, 234234, 3],
                        parentID: 0,
                        purchaseNote: "Thank you!",
-                       categories: [],
+                       categories: categories,
                        tags: [],
                        images: [],
                        attributes: [],

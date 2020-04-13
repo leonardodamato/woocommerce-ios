@@ -12,15 +12,17 @@ struct DefaultProductFormTableViewModel: ProductFormTableViewModel {
     //
     var siteTimezone: TimeZone = TimeZone.siteTimezone
 
-    private let canEditImages: Bool
+    private let isEditProductsRelease2Enabled: Bool
+    private let isEditProductsRelease3Enabled: Bool
 
     init(product: Product,
          currency: String,
          currencyFormatter: CurrencyFormatter = CurrencyFormatter(),
-         canEditImages: Bool = ServiceLocator.featureFlagService.isFeatureFlagEnabled(.editProductsRelease2)) {
+         featureFlagService: FeatureFlagService = ServiceLocator.featureFlagService) {
         self.currency = currency
         self.currencyFormatter = currencyFormatter
-        self.canEditImages = canEditImages
+        self.isEditProductsRelease2Enabled = featureFlagService.isFeatureFlagEnabled(.editProductsRelease2)
+        self.isEditProductsRelease3Enabled = featureFlagService.isFeatureFlagEnabled(.editProductsRelease3)
         configureSections(product: product)
     }
 }
@@ -32,7 +34,7 @@ private extension DefaultProductFormTableViewModel {
     }
 
     func primaryFieldRows(product: Product) -> [ProductFormSection.PrimaryFieldRow] {
-        guard canEditImages || product.images.isEmpty == false else {
+        guard isEditProductsRelease2Enabled || product.images.isEmpty == false else {
             return [
                 .name(name: product.name),
                 .description(description: product.trimmedFullDescription)
@@ -47,18 +49,19 @@ private extension DefaultProductFormTableViewModel {
     }
 
     func settingsRows(product: Product) -> [ProductFormSection.SettingsRow] {
-        guard product.downloadable == false && product.virtual == false else {
-            return [
-                .price(viewModel: priceSettingsRow(product: product)),
-                .inventory(viewModel: inventorySettingsRow(product: product))
-            ]
-        }
+        let shouldShowShippingSettingsRow = product.downloadable == false && product.virtual == false
+        let shouldShowBriefDescriptionRow = isEditProductsRelease2Enabled
+        let shouldShowCategoriesRow = isEditProductsRelease3Enabled
 
-        return [
+        let rows: [ProductFormSection.SettingsRow?] = [
             .price(viewModel: priceSettingsRow(product: product)),
-            .shipping(viewModel: shippingSettingsRow(product: product)),
-            .inventory(viewModel: inventorySettingsRow(product: product))
+            shouldShowShippingSettingsRow ? .shipping(viewModel: shippingSettingsRow(product: product)): nil,
+            .inventory(viewModel: inventorySettingsRow(product: product)),
+            shouldShowCategoriesRow ? .categories(viewModel: categoriesRow(product: product)): nil,
+            shouldShowBriefDescriptionRow ? .briefDescription(viewModel: briefDescriptionRow(product: product)): nil
         ]
+
+        return rows.compactMap { $0 }
     }
 }
 
@@ -70,12 +73,14 @@ private extension DefaultProductFormTableViewModel {
         var priceDetails = [String]()
 
         // Regular price and sale price are both available only when a sale price is set.
-        if let regularPrice = product.regularPrice, !regularPrice.isEmpty,
-            let salePrice = product.salePrice, !salePrice.isEmpty {
+        if let regularPrice = product.regularPrice, regularPrice.isNotEmpty {
             let formattedRegularPrice = currencyFormatter.formatAmount(regularPrice, with: currency) ?? ""
-            let formattedSalePrice = currencyFormatter.formatAmount(salePrice, with: currency) ?? ""
             priceDetails.append(String.localizedStringWithFormat(Constants.regularPriceFormat, formattedRegularPrice))
-            priceDetails.append(String.localizedStringWithFormat(Constants.salePriceFormat, formattedSalePrice))
+
+            if let salePrice = product.salePrice, salePrice.isNotEmpty {
+                let formattedSalePrice = currencyFormatter.formatAmount(salePrice, with: currency) ?? ""
+                priceDetails.append(String.localizedStringWithFormat(Constants.salePriceFormat, formattedSalePrice))
+            }
 
             if let dateOnSaleStart = product.dateOnSaleStart, let dateOnSaleEnd = product.dateOnSaleEnd {
                 let dateIntervalFormatter = DateIntervalFormatter.mediumLengthLocalizedDateIntervalFormatter
@@ -175,6 +180,23 @@ private extension DefaultProductFormTableViewModel {
                                                         title: title,
                                                         details: details)
     }
+
+    func categoriesRow(product: Product) -> ProductFormSection.SettingsRow.ViewModel {
+        let icon = UIImage.categoriesIcon
+        let title = Constants.categoriesTitle
+        let details = product.categoriesDescription() ?? Constants.categoriesPlaceholder
+        return ProductFormSection.SettingsRow.ViewModel(icon: icon, title: title, details: details)
+    }
+
+    func briefDescriptionRow(product: Product) -> ProductFormSection.SettingsRow.ViewModel {
+        let icon = UIImage.briefDescriptionImage
+        let title = Constants.briefDescriptionTitle
+        let details = product.trimmedBriefDescription?.isNotEmpty == true ? product.trimmedBriefDescription: Constants.briefDescriptionPlaceholder
+
+        return ProductFormSection.SettingsRow.ViewModel(icon: icon,
+                                                        title: title,
+                                                        details: details)
+    }
 }
 
 private extension DefaultProductFormTableViewModel {
@@ -185,6 +207,10 @@ private extension DefaultProductFormTableViewModel {
                                                               comment: "Title of the Inventory Settings row on Product main screen")
         static let shippingSettingsTitle = NSLocalizedString("Shipping",
                                                              comment: "Title of the Shipping Settings row on Product main screen")
+        static let categoriesTitle = NSLocalizedString("Categories",
+                                                       comment: "Title of the Categories row on Product main screen")
+        static let briefDescriptionTitle = NSLocalizedString("Short description",
+                                                             comment: "Title of the Short Description row on Product main screen")
 
         // Price
         static let regularPriceFormat = NSLocalizedString("Regular price: %@",
@@ -215,5 +241,13 @@ private extension DefaultProductFormTableViewModel {
                                                            comment: "Format of 2 dimensions on the Shipping Settings row - dimension x dimension[unit]")
         static let fullDimensionsFormat = NSLocalizedString("Dimensions: %1$@ x %2$@ x %3$@%4$@",
                                                             comment: "Format of all 3 dimensions on the Shipping Settings row - L x W x H[unit]")
+
+        // Short description
+        static let briefDescriptionPlaceholder = NSLocalizedString("A brief excerpt about the product",
+                                                                   comment: "Placeholder of the Product Short Description row on Product main screen")
+
+        // Categories
+        static let categoriesPlaceholder = NSLocalizedString("Uncategorized",
+                                                                   comment: "Placeholder of the Product Categories row on Product main screen")
     }
 }

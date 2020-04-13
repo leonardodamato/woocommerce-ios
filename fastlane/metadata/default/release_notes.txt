@@ -1,3 +1,7 @@
-- The Fulfill Order screen displays the full contents of customer-provided notes (when there is one) instead of cutting them off after single line, so you can see all the detail on one screen.
-- The count on the Orders tab bar now correctly refreshes when you switch between stores.
-- Quirks are intriguing in people and a lot less intriguing in apps, so we took care of a few bugs that caused some visual quirks (in particular, when changing system font sizes).
+A short list of changes this time around:
+
+- The order status label in the Order List no longer gets cut off, so you can actually see all the information.
+- If you ever wondered why the Woo logo on the launch screen looked a little stretched out, its because the aspect ratio was wonky — that’s fixed now.
+- For clarity, you’ll now see “Shipping Carrier” throughout the app instead of “Shipping Provider.”
+
+Stay safe and wash your hands, everyone!

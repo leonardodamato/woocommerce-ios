@@ -20,18 +20,21 @@ final class TopBannerView: UIView {
     private lazy var infoLabel: UILabel = {
         let label = UILabel(frame: .zero)
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.accessibilityIdentifier = "top-banner-view-info-label"
         return label
     }()
 
     private lazy var dismissButton: UIButton = {
         let button = UIButton(frame: .zero)
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.accessibilityIdentifier = "top-banner-view-dismiss-button"
         return button
     }()
 
     private lazy var expandCollapseButton: UIButton = {
         let button = UIButton(frame: .zero)
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.accessibilityIdentifier = "top-banner-view-expand-collapse-button"
         return button
     }()
 
@@ -83,7 +86,7 @@ private extension TopBannerView {
         infoLabel.numberOfLines = 0
 
         if isActionEnabled {
-            dismissButton.setImage(Gridicon.iconOfType(.cross, withSize: CGSize(width: 24, height: 24)), for: .normal)
+            dismissButton.setImage(UIImage.gridicon(.cross, size: CGSize(width: 24, height: 24)), for: .normal)
             dismissButton.tintColor = .textSubtle
             dismissButton.addTarget(self, action: #selector(onDismissButtonTapped), for: .touchUpInside)
 

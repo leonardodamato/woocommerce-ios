@@ -1,3 +1,7 @@
-- La pantalla Realizar pedido muestra el contenido completo de las notas proporcionadas por el cliente (cuando las hay) en lugar de cortarlas después de una sola línea, de modo que se puede ver toda la información en una pantalla.
-- El recuento de la barra de pestañas Pedidos ahora se actualiza correctamente al cambiar de tienda.
-- Las excentricidades hacen que las personas sean interesantes, pero no las aplicaciones, así que nos hemos encargado de algunos errores que causaban fallos visuales (en particular, al cambiar el tamaño de las fuentes del sistema).
+Esta vez tenemos una lista de cambios corta:
+
+- La etiqueta de estado del pedido en la lista de pedidos ya no se corta, así que puedes ver toda la información.
+- Si alguna vez te has preguntado por qué el logo de Woo en la pantalla de inicio se veía un poco estirado, es porque la relación de aspecto estaba mal. Ya lo hemos solucionado.
+- Para mayor claridad, ahora verás "Empresa de transporte" en toda la aplicación en lugar de "Proveedor de envío".
+
+¡Cuidaos y lavaos las manos!

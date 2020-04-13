@@ -38,8 +38,11 @@ class PeriodDataViewController: UIViewController {
     @IBOutlet private weak var chartAccessibilityView: UIView!
 
     private var lastUpdatedDate: Date?
-    private var yAxisMinimum: String = Constants.chartYAxisMinimum.humanReadableString()
-    private var yAxisMaximum: String = ""
+
+    private var grossSales: [Double] {
+        (orderStats?.items ?? []).map(\.grossSales)
+    }
+
     private var isInitialLoad: Bool = true  // Used in trackChangedTabIfNeeded()
 
     /// SiteVisitStats ResultsController: Loads site visit stats from the Storage Layer
@@ -87,6 +90,8 @@ class PeriodDataViewController: UIViewController {
         return lastUpdatedDate.relativelyFormattedUpdateString
     }
 
+    // MARK: x/y-Axis Values
+
     private var xAxisMinimum: String {
         guard let item = orderStats?.items?.first else {
             return ""
@@ -99,6 +104,22 @@ class PeriodDataViewController: UIViewController {
             return ""
         }
         return formattedAxisPeriodString(for: item)
+    }
+
+    private var yAxisMinimum: String {
+        guard let orderStats = orderStats else {
+            return ""
+        }
+        let min = grossSales.min() ?? 0
+        return CurrencyFormatter().formatHumanReadableAmount(String(min), with: orderStats.currencyCode) ?? ""
+    }
+
+    private var yAxisMaximum: String {
+        guard let orderStats = orderStats else {
+            return ""
+        }
+        let max = grossSales.max() ?? 0
+        return CurrencyFormatter().formatHumanReadableAmount(String(max), with: orderStats.currencyCode) ?? ""
     }
 
     // MARK: - Initialization
@@ -258,6 +279,8 @@ private extension PeriodDataViewController {
                               comment: "VoiceOver accessibility label for the store revenue chart. It reads: Store revenue chart {chart granularity}."),
             granularity.pluralizedString
         )
+
+        chartAccessibilityView.accessibilityIdentifier = "revenue-chart-" + granularity.accessibilityIdentifier
     }
 
     func configureBarChart() {
@@ -299,7 +322,6 @@ private extension PeriodDataViewController {
         yAxis.drawGridLinesEnabled = true
         yAxis.drawAxisLineEnabled = false
         yAxis.drawZeroLineEnabled = true
-        yAxis.axisMinimum = Constants.chartYAxisMinimum
         yAxis.valueFormatter = self
         yAxis.setLabelCount(3, force: true)
     }
@@ -317,7 +339,10 @@ private extension PeriodDataViewController {
 //
 extension PeriodDataViewController: IndicatorInfoProvider {
     func indicatorInfo(for pagerTabStripController: PagerTabStripViewController) -> IndicatorInfo {
-        return IndicatorInfo(title: granularity.pluralizedString)
+        return IndicatorInfo(
+            title: granularity.pluralizedString,
+            accessibilityIdentifier: "period-data-" + granularity.accessibilityIdentifier + "-tab"
+        )
     }
 }
 
@@ -363,8 +388,7 @@ extension PeriodDataViewController: IAxisValueFormatter {
                 // Do not show the "0" label on the Y axis
                 return ""
             } else {
-                yAxisMaximum = value.humanReadableString()
-                return CurrencyFormatter().formatCurrency(using: yAxisMaximum,
+                return CurrencyFormatter().formatCurrency(using: value.humanReadableString(),
                                                           at: CurrencySettings.shared.currencyPosition,
                                                           with: currencySymbol,
                                                           isNegative: value.sign == .minus)
@@ -625,6 +649,5 @@ private extension PeriodDataViewController {
         static let chartMarkerArrowSize: CGSize         = CGSize(width: 8, height: 6)
 
         static let chartXAxisGranularity: Double        = 1.0
-        static let chartYAxisMinimum: Double            = 0.0
     }
 }

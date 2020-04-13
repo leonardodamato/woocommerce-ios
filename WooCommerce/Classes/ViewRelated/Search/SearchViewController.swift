@@ -14,10 +14,6 @@ where Cell.SearchModel == Command.CellViewModel {
     ///
     @IBOutlet private var cancelButton: UIButton!
 
-    /// Empty State Legend
-    ///
-    @IBOutlet private var emptyStateLabel: UILabel!
-
     /// Main SearchBar
     ///
     @IBOutlet private var searchBar: UISearchBar!
@@ -38,6 +34,20 @@ where Cell.SearchModel == Command.CellViewModel {
     /// ResultsController: Surrounds us. Binds the galaxy together. And also, keeps the UITableView <> (Stored) models in sync.
     ///
     private let resultsController: ResultsController<Command.ResultsControllerModel>
+
+    /// The controller of the view to show if there is no search `keyword` entered.
+    ///
+    /// If `nil`, the `tableView` will be shown instead.
+    ///
+    /// - SeeAlso: State.starter
+    ///
+    private var starterViewController: UIViewController?
+
+    /// The controller of the view to show if the search results are empty.
+    ///
+    /// - SeeAlso: State.empty
+    ///
+    private lazy var emptyStateViewController: Command.EmptyStateViewControllerType = searchUICommand.createEmptyStateViewController()
 
     /// SyncCoordinator: Keeps tracks of which pages have been refreshed, and encapsulates the "What should we sync now" logic.
     ///
@@ -61,7 +71,7 @@ where Cell.SearchModel == Command.CellViewModel {
 
     /// UI Active State
     ///
-    private var state: State = .results {
+    private var state: State = .notInitialized {
         didSet {
             didLeave(state: oldValue)
             didEnter(state: state)
@@ -69,7 +79,9 @@ where Cell.SearchModel == Command.CellViewModel {
     }
 
     private lazy var keyboardFrameObserver: KeyboardFrameObserver = {
-        let keyboardFrameObserver = KeyboardFrameObserver(onKeyboardFrameUpdate: handleKeyboardFrameUpdate(keyboardFrame:))
+        let keyboardFrameObserver = KeyboardFrameObserver { [weak self] keyboardFrame in
+            self?.handleKeyboardFrameUpdate(keyboardFrame: keyboardFrame)
+        }
         return keyboardFrameObserver
     }()
 
@@ -105,14 +117,16 @@ where Cell.SearchModel == Command.CellViewModel {
         configureSyncingCoordinator()
         configureCancelButton()
         configureActions()
-        configureEmptyStateLabel()
         configureMainView()
         configureSearchBar()
         configureSearchBarBordersView()
         configureTableView()
         configureResultsController()
+        configureStarterViewController()
 
         startListeningToNotifications()
+
+        transitionToResultsUpdatedState()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -188,11 +202,29 @@ where Cell.SearchModel == Command.CellViewModel {
         view.endEditing(true)
         dismiss(animated: true, completion: nil)
     }
+
+    override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+
+        applyAdditionalKeyboardFrameHeightTo(children)
+    }
 }
+
+// MARK: - Keyboard Handling
 
 extension SearchViewController: KeyboardScrollable {
     var scrollable: UIScrollView {
         return tableView
+    }
+}
+
+private extension SearchViewController {
+    func applyAdditionalKeyboardFrameHeightTo(_ viewControllers: [UIViewController]) {
+        viewControllers.compactMap {
+            $0 as? KeyboardFrameAdjustmentProvider
+        }.forEach {
+            $0.additionalKeyboardFrameHeight = 0 - view.safeAreaInsets.bottom
+        }
     }
 }
 
@@ -219,6 +251,8 @@ private extension SearchViewController {
     ///
     func configureSearchBar() {
         searchBar.placeholder = searchUICommand.searchBarPlaceholder
+        searchBar.accessibilityIdentifier = searchUICommand.searchBarAccessibilityIdentifier
+
         if #available(iOS 13.0, *) {
             searchBar.searchTextField.textColor = .text
         }
@@ -234,6 +268,7 @@ private extension SearchViewController {
     ///
     func configureCancelButton() {
         cancelButton.applyModalCancelButtonStyle()
+        cancelButton.accessibilityIdentifier = searchUICommand.cancelButtonAccessibilityIdentifier
     }
 
     /// Setup: Actions
@@ -243,21 +278,39 @@ private extension SearchViewController {
         cancelButton.setTitle(title, for: .normal)
     }
 
-    /// Setup: No Results
-    ///
-    func configureEmptyStateLabel() {
-        emptyStateLabel.text = searchUICommand.emptyStateText
-        emptyStateLabel.textColor = .textSubtle
-        emptyStateLabel.font = .headline
-        emptyStateLabel.adjustsFontForContentSizeCategory = true
-        emptyStateLabel.numberOfLines = 0
-    }
-
     /// Setup: Results Controller
     ///
     func configureResultsController() {
         resultsController.startForwardingEvents(to: tableView)
         try? resultsController.performFetch()
+    }
+
+    /// Create and add `starterViewController` to the `view.`
+    ///
+    func configureStarterViewController() {
+        guard let starterViewController = searchUICommand.createStarterViewController(),
+            let starterView = starterViewController.view else {
+                return
+        }
+
+        starterView.translatesAutoresizingMaskIntoConstraints = false
+
+        add(starterViewController)
+        view.addSubview(starterView)
+
+        // Match the position and size to the `tableView`.
+        NSLayoutConstraint.activate([
+            starterView.leadingAnchor.constraint(equalTo: tableView.leadingAnchor),
+            starterView.trailingAnchor.constraint(equalTo: tableView.trailingAnchor),
+            starterView.topAnchor.constraint(equalTo: tableView.topAnchor),
+            starterView.bottomAnchor.constraint(equalTo: tableView.bottomAnchor)
+        ])
+
+        starterViewController.didMove(toParent: self)
+
+        starterView.isHidden = true
+
+        self.starterViewController = starterViewController
     }
 
     /// Setup: Sync'ing Coordinator
@@ -286,7 +339,7 @@ extension SearchViewController: SyncingCoordinatorDelegate {
 
     /// Synchronizes the models for the Default Store (if any).
     ///
-    func sync(pageNumber: Int, pageSize: Int, onCompletion: ((Bool) -> Void)? = nil) {
+    func sync(pageNumber: Int, pageSize: Int, reason: String?, onCompletion: ((Bool) -> Void)? = nil) {
         let keyword = self.keyword
         searchUICommand.synchronizeModels(siteID: storeID,
                                           keyword: keyword,
@@ -357,16 +410,58 @@ extension SearchViewController {
 //
 private extension SearchViewController {
 
-    /// Displays the Empty State Legend.
+    /// Displays the view for the empty state.
     ///
     func displayEmptyState() {
-        emptyStateLabel.isHidden = false
+        // Create the controller if it doesn't exist yet
+        let childController = emptyStateViewController
+
+        // Abort if we are already displaying this childController
+        guard childController.parent == nil else {
+            return
+        }
+
+        // Before creating the view (below), give the childController the keyboard adjustments
+        // they should use. This simplifies any keyboard observation they have in  `viewDidLoad`.
+        applyAdditionalKeyboardFrameHeightTo([childController])
+
+        // Create the view by accessing `.view`. This should trigger `viewDidLoad`.
+        guard let childView = childController.view else {
+            return
+        }
+
+        searchUICommand.configureEmptyStateViewControllerBeforeDisplay(viewController: childController,
+                                                                       searchKeyword: keyword)
+
+        childView.translatesAutoresizingMaskIntoConstraints = false
+
+        add(childController)
+        view.addSubview(childView)
+
+        // Match the position and size to the `tableView`. Attach top to the searchBar
+        NSLayoutConstraint.activate([
+            childView.leadingAnchor.constraint(equalTo: tableView.leadingAnchor),
+            childView.trailingAnchor.constraint(equalTo: tableView.trailingAnchor),
+            childView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
+            childView.bottomAnchor.constraint(equalTo: tableView.bottomAnchor)
+        ])
+
+        childController.didMove(toParent: self)
     }
 
-    /// Removes the Empty State Legend.
+    /// Removes the view for the empty state.
     ///
     func removeEmptyState() {
-        emptyStateLabel.isHidden = true
+        let childController = emptyStateViewController
+
+        guard let childView = childController.view,
+              childController.parent == self else {
+            return
+        }
+
+        childController.willMove(toParent: nil)
+        childView.removeFromSuperview()
+        childController.removeFromParent()
     }
 }
 
@@ -377,36 +472,62 @@ private extension SearchViewController {
 
     func didEnter(state: State) {
         switch state {
+        case .starter:
+            tableView.isHidden = true
+            starterViewController?.view.isHidden = false
         case .empty:
             displayEmptyState()
         case .syncing:
             ensureFooterSpinnerIsStarted()
-        case .results:
+        case .results, .notInitialized:
             break
         }
     }
 
     func didLeave(state: State) {
         switch state {
+        case .starter:
+            starterViewController?.view.isHidden = true
+            tableView.isHidden = false
         case .empty:
             removeEmptyState()
         case .syncing:
             ensureFooterSpinnerIsStopped()
-        case .results:
+        case .results, .notInitialized:
             break
         }
     }
 
-    /// Should be called before Sync'ing. Transitions to either `results` state.
+    /// The state to use if the `keyword` is empty.
     ///
-    func transitionToSyncingState() {
-        state = .syncing
+    var stateIfSearchKeywordIsEmpty: State {
+        starterViewController != nil ? .starter : .results
     }
 
-    /// Should be called whenever new results have been retrieved. Transitions to `.results` / `.empty` accordingly.
+    /// Transition to the appropriate `State` after a search request was executed.
+    ///
+    /// See `State` for the rules.
+    ///
+    func transitionToSyncingState() {
+        state = keyword.isEmpty ? stateIfSearchKeywordIsEmpty : .syncing
+    }
+
+    /// Transition to the appropriate `State` after search results were received.
+    ///
+    /// See `State` for the rules.
     ///
     func transitionToResultsUpdatedState() {
-        state = isEmpty ? .empty : .results
+        let nextState: State
+
+        if keyword.isEmpty {
+            nextState = stateIfSearchKeywordIsEmpty
+        } else if isEmpty {
+            nextState = .empty
+        } else {
+            nextState = .results
+        }
+
+        state = nextState
     }
 }
 
@@ -422,7 +543,24 @@ private enum Settings {
 // MARK: - FSM States
 //
 private enum State {
-    case syncing
+    /// The view has not been loaded yet.
+    ///
+    case notInitialized
+    /// The state when there is no search `keyword` and the `starterViewController` is shown.
+    ///
+    /// This state is never reached if `starterViewController` is `nil`.
+    ///
+    case starter
+    /// The state when there are search results.
+    ///
+    /// This is also the default `state` if there is no `starterViewController`. Search result
+    /// providers (i.e. `SearchUICommand`) can opt to show a default list of items in this case.
+    ///
     case results
+    /// The state when a `keyword` is entered and a search is in progress.
+    ///
+    case syncing
+    /// The state when the search has finished but there are no results.
+    ///
     case empty
 }

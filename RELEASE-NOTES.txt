@@ -1,11 +1,61 @@
+4.1
+-----
+- Fix an intermittent crash when downloading Orders
+- The Photo Library permission alert shouldn't be prompted when opening the readonly product details or edit product for simple products, which is reproducible on iOS 11 or 12 devices. (The permission is only triggered when uploading images in Zendesk support or in debug builds with Products M2 enabled.)
+- [internal] Updated the empty search result views for Products and Orders. https://git.io/Jvdap
+
+ 
+4.0
+-----
+- Products is now available with limited editing for simple products!
+- Fix pulling to refresh on the Processing tab sometimes will not show the up-to-date orders.
+- Edit Product > Price Settings: schedule sale is now available even when either the start or end date is not set, and the sale end date can be removed now.
+- Improved stats: fixed a crash when loading improved stats on a day when daily saving time changes.
+- [internal] Changed the Shipping and Tax classes list loading so that any cached data is shown right away
+- [internal] Edit Products M2: added an image upload source for product images - WordPress Media Library.
+- [internal] Slightly changed the dependency graph of the database fetching component. Please watch out for data loading regressions.
+- [internal] the signup and login Magic Link flows have code changes. See https://git.io/JvyB3 for testing details.
+- [internal] the login via Magic Link flows have code changes. See https://git.io/JvyB3 for testing details.
+- [internal] the login via Continue with Google flows have code changes that can cause regressions. See https://git.io/Jvyjg for testing details.
+- [internal] the signup and login Magic Link flows have code changes. See https://git.io/JvyB3 for testing details.
+- [internal] under Edit Products M2 feature flag, there are 4 ways to sort the products on the products tab.
+- [internal] the login flow has changes to the 2-factor authentication navigation. See https://git.io/JvdKP for testing details.
+
+3.9
+-----
+- bugfix: now in the Order List the order status label is no more clipped
+- bugfix: now the launch screen is no more stretched
+- The Shipping Provider flow, will be called now Shipping Carrier.
+- Edit Products: in price settings, the order of currency and price field follows the store currency options under wp-admin > WooCommerce > Settings > General.
+- [internal] The signup and login flows have code changes. See https://git.io/Jv1Me for testing details.
+ 
+3.8
+-----
+- Dashboard stats: any negative revenue (from refunds for example) for a time period are shown now.
+- Redesigned Orders List: Processing and All Orders are now shown in front. Filtering was moved to the Search view.
+- Fix Reviews sometimes failing to load on some WooCommerce configurations
+- Experimental: a Products feature switch is visible in Settings > Experimental Features that shows/hides the Products tab, and allow to edit a product.
+ 
+3.7
+-----
+- Dashboard: now tapping on a product on "Top Performers" section open the product detail
+
 3.6
 -----
+- Order Details: see a list of issued refunds inside the order detail screen
 - Orders tab: Orders to fulfill badge shows numbers 1-99, and now 99+ for anything over 99. Previously, it was 9+.
+- Orders tab: The full total amount is now shown.
+- Order Details & Product UI: if a Product name has HTML escape characters, they should be decoded in the app.
+- Order Details: if the Order has multiple Products, tapping on any Product should open the same Product now.
+- bugfix: the orders badge on tab bar now is correctly refreshed after switching to a store with badge count equal to zero.
+- The orders tab now localizes item quantities and the order badge.
+
 
 3.5
 -----
 - bugfix: when the app is in the foreground while receiving a push notification, the badge on the Orders tab and Reviews tab should be updated correctly based on the type of the notification.
 - bugfix: after logging out and in, the Product list should be loaded to the correct store instead of being empty.
+- bugfix: in Contact Support, a message should always be sent successfully now.
 
 3.4
 -----
@@ -16,6 +66,7 @@
 - bugfix/enhancement: on the Products tab, if there are no Products the "Work In Progress" banner is shown with an image placeholder below now.
 - bugfix: the deleted Product Variations should not show up after syncing anymore.
 - bugfix: now the shipping address in the Order Detail is hidden if the order contains only virtual products
+- bugfix: when logged out, Contact Support should be enabled now after typing a valid email address with an email keyboard type.
 
 3.3
 -----

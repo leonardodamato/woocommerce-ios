@@ -34,7 +34,7 @@ class StoreStatsV4PeriodViewController: UIViewController {
     private var orderStatsIntervals: [OrderStatsV4Interval] = [] {
         didSet {
             let helper = StoreStatsV4ChartAxisHelper()
-            let intervalDates = orderStatsIntervals.map({ $0.dateStart() })
+            let intervalDates = orderStatsIntervals.map({ $0.dateStart(timeZone: siteTimezone) })
             orderStatsIntervalLabels = helper.generateLabelText(for: intervalDates,
                                                                 timeRange: timeRange,
                                                                 siteTimezone: siteTimezone)
@@ -71,8 +71,15 @@ class StoreStatsV4PeriodViewController: UIViewController {
     @IBOutlet private weak var timeRangeBarBottomBorderView: UIView!
 
     private var lastUpdatedDate: Date?
-    private var yAxisMinimum: String = Constants.chartYAxisMinimum.humanReadableString()
-    private var yAxisMaximum: String = ""
+
+    private var currencyCode: String {
+        return CurrencySettings.shared.symbol(from: CurrencySettings.shared.currencyCode)
+    }
+
+    private var revenueItems: [Double] {
+        return orderStatsIntervals.map({ ($0.revenueValue as NSDecimalNumber).doubleValue })
+    }
+
     private var isInitialLoad: Bool = true  // Used in trackChangedTabIfNeeded()
 
     /// SiteVisitStats ResultsController: Loads site visit stats from the Storage Layer
@@ -108,6 +115,8 @@ class StoreStatsV4PeriodViewController: UIViewController {
         return lastUpdatedDate.relativelyFormattedUpdateString
     }
 
+    // MARK: x/y-Axis Values
+
     private var xAxisMinimum: String {
         guard let item = orderStatsIntervals.first else {
             return ""
@@ -120,6 +129,20 @@ class StoreStatsV4PeriodViewController: UIViewController {
             return ""
         }
         return formattedAxisPeriodString(for: item)
+    }
+
+    private var yAxisMinimum: String {
+        let min = revenueItems.min() ?? 0
+        return CurrencyFormatter().formatHumanReadableAmount(String(min),
+                                                             with: currencyCode,
+                                                             roundSmallNumbers: false) ?? String()
+    }
+
+    private var yAxisMaximum: String {
+        let max = revenueItems.max() ?? 0
+        return CurrencyFormatter().formatHumanReadableAmount(String(max),
+                                                             with: currencyCode,
+                                                             roundSmallNumbers: false) ?? String()
     }
 
     // MARK: - Initialization
@@ -339,7 +362,6 @@ private extension StoreStatsV4PeriodViewController {
         yAxis.drawGridLinesEnabled = true
         yAxis.drawAxisLineEnabled = false
         yAxis.drawZeroLineEnabled = true
-        yAxis.axisMinimum = Constants.chartYAxisMinimum
         yAxis.valueFormatter = self
         yAxis.setLabelCount(3, force: true)
     }
@@ -470,8 +492,8 @@ private extension StoreStatsV4PeriodViewController {
     ///
     /// - Parameter selectedIndex: the index of interval data for the bar chart. Nil if no bar is selected.
     func updateTimeRangeBar(selectedIndex: Int?) {
-        guard let startDate = orderStatsIntervals.first?.dateStart(),
-            let endDate = orderStatsIntervals.last?.dateStart() else {
+        guard let startDate = orderStatsIntervals.first?.dateStart(timeZone: siteTimezone),
+            let endDate = orderStatsIntervals.last?.dateStart(timeZone: siteTimezone) else {
                 return
         }
         guard let selectedIndex = selectedIndex else {
@@ -482,7 +504,7 @@ private extension StoreStatsV4PeriodViewController {
             timeRangeBarView.updateUI(viewModel: timeRangeBarViewModel)
             return
         }
-        let date = orderStatsIntervals[selectedIndex].dateStart()
+        let date = orderStatsIntervals[selectedIndex].dateStart(timeZone: siteTimezone)
         let timeRangeBarViewModel = StatsTimeRangeBarViewModel(startDate: startDate,
                                                                endDate: endDate,
                                                                selectedDate: date,
@@ -507,8 +529,7 @@ extension StoreStatsV4PeriodViewController: IAxisValueFormatter {
                 // Do not show the "0" label on the Y axis
                 return ""
             } else {
-                yAxisMaximum = value.humanReadableString()
-                return CurrencyFormatter().formatCurrency(using: yAxisMaximum,
+                return CurrencyFormatter().formatCurrency(using: value.humanReadableString(),
                                                           at: CurrencySettings.shared.currencyPosition,
                                                           with: currencySymbol,
                                                           isNegative: value.sign == .minus)
@@ -593,10 +614,10 @@ private extension StoreStatsV4PeriodViewController {
 
     func updateOrderDataIfNeeded() {
         orderStatsIntervals = orderStats?.intervals.sorted(by: { (lhs, rhs) -> Bool in
-            return lhs.dateStart() < rhs.dateStart()
+            return lhs.dateStart(timeZone: siteTimezone) < rhs.dateStart(timeZone: siteTimezone)
         }) ?? []
-        if let startDate = orderStatsIntervals.first?.dateStart(),
-            let endDate = orderStatsIntervals.last?.dateStart() {
+        if let startDate = orderStatsIntervals.first?.dateStart(timeZone: siteTimezone),
+            let endDate = orderStatsIntervals.last?.dateStart(timeZone: siteTimezone) {
             let timeRangeBarViewModel = StatsTimeRangeBarViewModel(startDate: startDate,
                                                                    endDate: endDate,
                                                                    timeRange: timeRange,
@@ -688,8 +709,7 @@ private extension StoreStatsV4PeriodViewController {
     }
 
     func hasRevenue() -> Bool {
-        let totalRevenue = orderStatsIntervals.map({ $0.revenueValue }).reduce(0, +)
-        return totalRevenue > 0
+        return revenueItems.contains { $0 != 0 }
     }
 
     func reloadLastUpdatedField() {
@@ -727,12 +747,12 @@ private extension StoreStatsV4PeriodViewController {
 
     func formattedAxisPeriodString(for item: OrderStatsV4Interval) -> String {
         let chartDateFormatter = timeRange.chartDateFormatter(siteTimezone: siteTimezone)
-        return chartDateFormatter.string(from: item.dateStart())
+        return chartDateFormatter.string(from: item.dateStart(timeZone: siteTimezone))
     }
 
     func formattedChartMarkerPeriodString(for item: OrderStatsV4Interval) -> String {
         let chartDateFormatter = timeRange.chartDateFormatter(siteTimezone: siteTimezone)
-        return chartDateFormatter.string(from: item.dateStart())
+        return chartDateFormatter.string(from: item.dateStart(timeZone: siteTimezone))
     }
 }
 
@@ -753,6 +773,5 @@ private extension StoreStatsV4PeriodViewController {
         static let chartMarkerArrowSize: CGSize         = CGSize(width: 8, height: 6)
 
         static let chartXAxisGranularity: Double        = 1.0
-        static let chartYAxisMinimum: Double            = 0.0
     }
 }

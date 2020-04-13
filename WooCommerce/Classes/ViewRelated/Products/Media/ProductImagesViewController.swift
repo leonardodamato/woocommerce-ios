@@ -13,36 +13,66 @@ final class ProductImagesViewController: UIViewController {
 
     private let siteID: Int64
     private let productID: Int64
+
+    private let productImageActionHandler: ProductImageActionHandler
+    private let productUIImageLoader: ProductUIImageLoader
+
+    private let originalProductImages: [ProductImage]
+    private var productImageStatuses: [ProductImageStatus] = []
     private var productImages: [ProductImage] {
-        didSet {
-            imagesViewController.updateProductImages(productImages)
+        return productImageStatuses.compactMap { status in
+            switch status {
+            case .remote(let productImage):
+                return productImage
+            default:
+                return nil
+            }
         }
     }
+    private var productImageStatusesObservationToken: ObservationToken?
 
     // Child view controller.
     private lazy var imagesViewController: ProductImagesCollectionViewController = {
-        let viewController = ProductImagesCollectionViewController(images: productImages,
-                                                                   onDeletion: onDeletion)
+        let viewController = ProductImagesCollectionViewController(imageStatuses: productImageStatuses,
+                                                                   productUIImageLoader: productUIImageLoader,
+                                                                   onDeletion: { [weak self] productImage in
+                                                                    self?.onDeletion(productImage: productImage)
+        })
         return viewController
     }()
 
     private lazy var mediaPickingCoordinator: MediaPickingCoordinator = {
-        return MediaPickingCoordinator(onCameraCaptureCompletion: self.onCameraCaptureCompletion,
-                                       onDeviceMediaLibraryPickerCompletion: self.onDeviceMediaLibraryPickerCompletion(assets:))
+        return MediaPickingCoordinator(siteID: siteID,
+                                       onCameraCaptureCompletion: { [weak self] asset, error in
+                                        self?.onCameraCaptureCompletion(asset: asset, error: error)
+            }, onDeviceMediaLibraryPickerCompletion: { [weak self] assets in
+                self?.onDeviceMediaLibraryPickerCompletion(assets: assets)
+            }, onWPMediaPickerCompletion: { [weak self] mediaItems in
+                self?.onWPMediaPickerCompletion(mediaItems: mediaItems)
+        })
     }()
 
     private let onCompletion: Completion
 
-    init(product: Product, completion: @escaping Completion) {
+    init(product: Product,
+         productImageActionHandler: ProductImageActionHandler,
+         productUIImageLoader: ProductUIImageLoader,
+         completion: @escaping Completion) {
         self.siteID = product.siteID
         self.productID = product.productID
-        self.productImages = product.images
+        self.productImageActionHandler = productImageActionHandler
+        self.productUIImageLoader = productUIImageLoader
+        self.originalProductImages = product.images
         self.onCompletion = completion
         super.init(nibName: nil, bundle: nil)
     }
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    deinit {
+        productImageStatusesObservationToken?.cancel()
     }
 
     override func viewDidLoad() {
@@ -53,6 +83,7 @@ final class ProductImagesViewController: UIViewController {
         configureAddButton()
         configureAddButtonBottomBorderView()
         configureImagesContainerView()
+        configureProductImagesObservation()
     }
 }
 
@@ -66,7 +97,7 @@ private extension ProductImagesViewController {
     func configureNavigation() {
         title = NSLocalizedString("Photos", comment: "Product images (Product images page title)")
 
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(completeEditing))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(doneButtonTapped))
 
         removeNavigationBackBarButtonText()
     }
@@ -91,6 +122,22 @@ private extension ProductImagesViewController {
         imagesViewController.view.translatesAutoresizingMaskIntoConstraints = false
         imagesContainerView.pinSubviewToSafeArea(imagesViewController.view)
     }
+
+    func configureProductImagesObservation() {
+        productImageStatusesObservationToken = productImageActionHandler.addUpdateObserver(self) { [weak self] (productImageStatuses, error) in
+            guard let self = self else {
+                return
+            }
+
+            self.productImageStatuses = productImageStatuses
+
+            if let error = error {
+                self.displayErrorAlert(error: error)
+            }
+
+            self.imagesViewController.updateProductImageStatuses(productImageStatuses)
+        }
+    }
 }
 
 // MARK: - Actions
@@ -101,7 +148,7 @@ private extension ProductImagesViewController {
         showOptionsMenu()
     }
 
-    @objc func completeEditing() {
+    @objc func doneButtonTapped() {
         onCompletion(productImages)
     }
 
@@ -111,8 +158,38 @@ private extension ProductImagesViewController {
     }
 
     func onDeletion(productImage: ProductImage) {
-        productImages.removeAll(where: { $0.imageID == productImage.imageID })
+        productImageActionHandler.deleteProductImage(productImage)
         navigationController?.popViewController(animated: true)
+    }
+}
+
+// MARK: - Navigation actions handling
+//
+extension ProductImagesViewController {
+    override func shouldPopOnBackButton() -> Bool {
+        guard hasOutstandingChanges() == false else {
+            presentDiscardChangesActionSheet()
+            return false
+        }
+        return true
+    }
+
+    private func presentDiscardChangesActionSheet() {
+        UIAlertController.presentDiscardChangesActionSheet(viewController: self, onDiscard: { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
+        })
+    }
+
+    private func hasOutstandingChanges() -> Bool {
+        return originalProductImages != productImages
+    }
+}
+
+// MARK: - Image upload to WP Media Library and Product
+//
+private extension ProductImagesViewController {
+    func uploadMediaAssetToSiteMediaLibrary(asset: PHAsset) {
+        productImageActionHandler.uploadMediaAssetToSiteMediaLibrary(asset: asset)
     }
 }
 
@@ -120,11 +197,11 @@ private extension ProductImagesViewController {
 //
 private extension ProductImagesViewController {
     func onCameraCaptureCompletion(asset: PHAsset?, error: Error?) {
-        guard let _ = asset else {
+        guard let asset = asset else {
             displayErrorAlert(error: error)
             return
         }
-        // TODO-1713: handle media from camera
+        uploadMediaAssetToSiteMediaLibrary(asset: asset)
     }
 }
 
@@ -138,7 +215,18 @@ private extension ProductImagesViewController {
         guard assets.isEmpty == false else {
             return
         }
-        // TODO-1713: handle media from photo library
+        assets.forEach { asset in
+            uploadMediaAssetToSiteMediaLibrary(asset: asset)
+        }
+    }
+}
+
+// MARK: - Action handling for WordPress Media Library
+//
+private extension ProductImagesViewController {
+    func onWPMediaPickerCompletion(mediaItems: [Media]) {
+        dismiss(animated: true, completion: nil)
+        productImageActionHandler.addSiteMediaLibraryImagesToProduct(mediaItems: mediaItems)
     }
 }
 

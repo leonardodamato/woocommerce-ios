@@ -1,3 +1,7 @@
-- Sipariş Tamamlama ekranında, müşteri tarafından sağlanan notların tek satırdan sonra kırpılmış hali yerine tüm içeriği gösterilir (bir tane varsa), böylece bir ekranda tüm detayları görebilirsiniz.
-- Siparişler sekmesi çubuğundaki sayı, mağazalar arasında geçiş yaptığınızda artık doğru şekilde yenilenir.
-- Bazı tuhaflıklar insanları rahatsız ediyor ve bu, uygulamalarda da söz konusu. Bu yüzden görsel tuhaflıklara (özellikle sistem yazı tipi boyutunu değiştirirken ortaya çıkan) yol açan bazı hataları giderdik.
+Bu kez yapılan değişikliklerin kısa bir listesi:
+
+- Sipariş Listesindeki sipariş durumu etiketi artık kesilmiyor, tüm bilgileri görebiliyorsunuz.
+- Başlatma ekranındaki Woo logosunun neden biraz uzatılmış gibi göründüğünü merak ediyorsanız, bu sorun en-boy oranından kaynaklanıyordu ve artık düzeltildi.
+- Artık uygulama genelinde "Kargo Sağlayıcısı" yerine "Kargo Şirketi" ifadesini göreceksiniz.
+
+Herkes güvende kalsın ve ellerini yıkasın!

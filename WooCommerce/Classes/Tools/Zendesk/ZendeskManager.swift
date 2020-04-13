@@ -1,5 +1,5 @@
 import Foundation
-import ZendeskSDK
+import SupportSDK
 import ZendeskCoreSDK
 import CommonUISDK // Zendesk UI SDK
 import WordPressShared
@@ -83,7 +83,7 @@ class ZendeskManager: NSObject {
         Zendesk.initialize(appId: ApiCredentials.zendeskAppId,
                            clientId: ApiCredentials.zendeskClientId,
                            zendeskUrl: ApiCredentials.zendeskUrl)
-        SupportUI.initialize(withZendesk: Zendesk.instance)
+        Support.initialize(withZendesk: Zendesk.instance)
         CommonTheme.currentTheme.primaryColor = UIColor.primary
 
         haveUserIdentity = getUserProfile()
@@ -360,6 +360,7 @@ private extension ZendeskManager {
     }
 
     func getUserInformationAndShowPrompt(withName: Bool, from viewController: UIViewController, completion: @escaping onUserInformationCompletion) {
+        presentInController = viewController
         getUserInformationIfAvailable()
         promptUserForInformation(withName: withName, from: viewController) { (success, email) in
             guard success else {
@@ -547,6 +548,11 @@ private extension ZendeskManager {
                 return ""
         }
 
+        // Truncates the log text so it fits in the ticket field.
+        if logText.count > Constants.logFieldCharacterLimit {
+            return String(logText.suffix(Constants.logFieldCharacterLimit))
+        }
+
         return logText
     }
 
@@ -627,6 +633,7 @@ private extension ZendeskManager {
         // Email Text Field
         alertController.addTextField { textField in
             textField.clearButtonMode = .always
+            textField.keyboardType = .emailAddress
             textField.placeholder = LocalizedText.emailPlaceholder
             textField.text = self.userEmail
 
@@ -796,6 +803,7 @@ private extension ZendeskManager {
         static let blogSeperator = "\n----------\n"
         static let jetpackTag = "jetpack"
         static let wpComTag = "wpcom"
+        static let logFieldCharacterLimit = 64000
         static let networkWiFi = "WiFi"
         static let networkWWAN = "Mobile"
         static let networkTypeLabel = "Network Type:"

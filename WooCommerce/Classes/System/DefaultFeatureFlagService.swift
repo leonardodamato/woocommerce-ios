@@ -4,15 +4,15 @@ struct DefaultFeatureFlagService: FeatureFlagService {
         case .productList:
             return true
         case .editProducts:
-            return BuildConfiguration.current == .localDeveloper
+            return true
         case .editProductsRelease2:
-            return BuildConfiguration.current == .localDeveloper
+            return BuildConfiguration.current == .localDeveloper || BuildConfiguration.current == .alpha
+        case .editProductsRelease3:
+            return BuildConfiguration.current == .localDeveloper || BuildConfiguration.current == .alpha
         case .readonlyProductVariants:
             return true
-        case .stats:
-            return true
         case .refunds:
-            return BuildConfiguration.current == .localDeveloper
+            return true
         default:
             return true
         }

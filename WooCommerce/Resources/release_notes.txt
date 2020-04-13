@@ -1,2 +1,3 @@
-- A well-designed app is a joy to use, so we took care of an alignment bug on the order details screen, made some enhancements to dark mode, hid the shipping address for virtual products on the order details screen, and added a nice placeholder image when there are no products to show in a product list.
-- There are three fewer bugs in the world: if you ever tapped on a new order push notification and ended up looking at reviews instead of orders, switched stores and ended up with an incorrect product listing, or didn’t see you product variations on a single product screen, those are now experiences of the past.
+* We’re excited to introduce a Products tab!
+* Users also now have limited editing capabilities for Simple Products, with more to come.
+* We’ve made a fix so that, whenever you refresh the Processing tab, it will show your up-to-date orders.

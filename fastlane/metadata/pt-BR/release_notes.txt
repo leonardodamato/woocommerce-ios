@@ -1,3 +1,7 @@
-- A tela Concluir pedido exibe todo o conteúdo das observações fornecidas pelo cliente, se houver, em vez de as cortar após uma única linha. Assim, você vê todos os detalhes em apenas uma tela.
-- A contagem na guia Pedidos agora é corretamente atualizada quando você troca as lojas.
-- Peculiaridades são ótimas em pessoas, mas não tanto em aplicativos. Por isso, corrigimos alguns bugs que causavam peculiaridades visuais, principalmente os que alteravam o tamanho das fontes do sistema.
+Uma breve lista de alterações;
+
+- O rótulo de status do pedido na Lista de pedidos não é mais cortado; ele exibe todas as informações.
+- Correção do bug na taxa de proporção que esticava o logotipo do WooCommerce na tela de início.
+- Agora em vez de “Fornecedora” você verá “Transportadora” no app.
+
+Fiquem seguros e lavem suas mãos!

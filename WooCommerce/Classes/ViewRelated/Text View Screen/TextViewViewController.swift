@@ -25,7 +25,9 @@ final class TextViewViewController: UIViewController {
     @IBOutlet private weak var placeholderLabelBottomConstraint: NSLayoutConstraint!
 
     private lazy var keyboardFrameObserver: KeyboardFrameObserver = {
-        let keyboardFrameObserver = KeyboardFrameObserver(onKeyboardFrameUpdate: handleKeyboardFrameUpdate(keyboardFrame:))
+        let keyboardFrameObserver = KeyboardFrameObserver { [weak self] keyboardFrame in
+            self?.handleKeyboardFrameUpdate(keyboardFrame: keyboardFrame)
+        }
         return keyboardFrameObserver
     }()
 
@@ -61,6 +63,7 @@ final class TextViewViewController: UIViewController {
         super.viewDidLoad()
 
         configureNavigation()
+        configureView()
         configureTextView()
         configurePlaceholderLabel()
         refreshPlaceholderVisibility()
@@ -100,9 +103,7 @@ extension TextViewViewController {
     }
 
     private func presentBackNavigationActionSheet() {
-        UIAlertController.presentSaveChangesActionSheet(viewController: self, onSave: { [weak self] in
-            self?.completeEditing()
-        }, onDiscard: { [weak self] in
+        UIAlertController.presentDiscardChangesActionSheet(viewController: self, onDiscard: { [weak self] in
             self?.navigationController?.popViewController(animated: true)
         })
     }
@@ -115,6 +116,10 @@ private extension TextViewViewController {
         title = navigationTitle
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(completeEditing))
+    }
+
+    func configureView() {
+        view.backgroundColor = .basicBackground
     }
 
     func configureTextView() {

@@ -1,3 +1,7 @@
-- Der Bildschirm für die Auftragsausführung zeigt den gesamten Inhalt der Kundennachrichten an (falls vorhanden) und nicht nur die erste Zeile. So siehst du alle Details direkt auf einem Bildschirm.
-- Die Anzahl auf dem Tab „Aufträge“ wird jetzt korrekt aktualisiert, wenn du zwischen verschiedenen Shops wechselst.
-- Macken machen zwar Menschen interessant, sind jedoch in Apps unerwünscht. Daher haben wir einige Fehler behoben, die zu diesen Macken geführt haben (insbesondere beim Ändern der Systemschriftgröße).
+Eine kurze Liste der aktuellen Änderungen:
+
+- Die Bestellstatusbezeichnung wird in der Bestellliste nicht mehr abgeschnitten, sodass jetzt alle Informationen angezeigt werden.
+- Wenn du dich schon einmal gefragt hast, warum das Woo-Logo auf dem Startbildschirm ein wenig gestreckt aussieht, dann liegt das daran, dass das Seitenverhältnis nicht gestimmt hat – das ist jetzt behoben.
+- Für mehr Klarheit wird in der gesamten App statt „Versanddienstleister“ jetzt „Lieferanbieter“ verwendet.
+
+Bleibt alle gesund und wascht eure Hände!

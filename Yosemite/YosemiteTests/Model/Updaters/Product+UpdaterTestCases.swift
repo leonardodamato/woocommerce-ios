@@ -105,6 +105,32 @@ final class Product_UpdaterTestCases: XCTestCase {
         // Images.
         XCTAssertEqual(updatedProduct.images, newImages)
     }
+
+    func testUpdatingBriefDescription() {
+        let product = sampleProduct()
+        let newBriefDescription = "<p> deal of the day! </p>"
+        let updatedProduct = product.briefDescriptionUpdated(briefDescription: newBriefDescription)
+        XCTAssertEqual(updatedProduct.briefDescription, newBriefDescription)
+        XCTAssertEqual(updatedProduct.fullDescription, product.fullDescription)
+        XCTAssertEqual(updatedProduct.name, product.name)
+    }
+
+    func testUpdatingProductSettings() {
+        let product = sampleProduct()
+        let newStatus = "pending"
+        let featured = true
+        let catalogVisibility = "search"
+        let slug = "this-is-a-test"
+        let productSettings = ProductSettings(status: .pending,
+                                                                featured: featured,
+                                                                catalogVisibility: .search,
+                                                                slug: slug)
+        let updatedProduct = product.productSettingsUpdated(settings: productSettings)
+        XCTAssertEqual(updatedProduct.statusKey, newStatus)
+        XCTAssertEqual(updatedProduct.featured, featured)
+        XCTAssertEqual(updatedProduct.catalogVisibilityKey, catalogVisibility)
+        XCTAssertEqual(updatedProduct.slug, slug)
+    }
 }
 
 // MARK: - Private Helpers
@@ -184,7 +210,7 @@ private extension Product_UpdaterTestCases {
     }
 
     func sampleCategories() -> [Networking.ProductCategory] {
-        let category1 = ProductCategory(categoryID: 36, name: "Events", slug: "events")
+        let category1 = ProductCategory(categoryID: 36, siteID: 123, parentID: 0, name: "Events", slug: "events")
         return [category1]
     }
 
